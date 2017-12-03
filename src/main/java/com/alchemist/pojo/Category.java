@@ -27,6 +27,12 @@ public class Category {
         this.updateTime = updateTime;
     }
 
+    public Category(Integer parentId, String name, Boolean status) {
+        this.parentId = parentId;
+        this.name = name;
+        this.status = status;
+    }
+
     public Category() {
         super();
     }

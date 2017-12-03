@@ -1,6 +1,7 @@
 package com.alchemist.dao;
 
 import com.alchemist.pojo.User;
+import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +15,8 @@ public interface UserMapper {
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
+
+    User selectByUsername(@Param("username") String username);
+
+    User selectByEmail(@Param("email") String email);
 }
