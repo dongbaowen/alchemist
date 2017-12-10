@@ -1,11 +1,11 @@
 package com.alchemist.service.impl;
 
 import com.alchemist.common.Const;
+import com.alchemist.common.ResponseCode;
 import com.alchemist.dao.UserMapper;
 import com.alchemist.exception.BusinessException;
 import com.alchemist.pojo.User;
 import com.alchemist.pojo.dto.UserDTO;
-import com.alchemist.pojo.dto.UserVO;
 import com.alchemist.service.IUserService;
 import com.alchemist.util.MD5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -68,5 +68,16 @@ public class UserServiceImpl implements IUserService {
         return false;
     }
 
+    @Override
+    public boolean isAdminPermission(String username){
+        User user = userMapper.selectByUsername(username);
+        if (user == null) {
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND.getCode(), ResponseCode.USER_NOT_FOUND.getDesc());
+        }
+        if (!Objects.equals(Const.Role.ROLE_ADMIN, user.getRole())) {
+            throw new BusinessException(ResponseCode.PERMISSION_DEFINDE.getCode(), ResponseCode.PERMISSION_DEFINDE.getDesc());
+        }
+        return true;
+    }
 
 }

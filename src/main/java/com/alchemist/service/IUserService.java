@@ -13,4 +13,6 @@ public interface IUserService {
     void signUp(UserDTO userDTO);
 
     boolean checkValid(String str, String type);
+
+    boolean isAdminPermission(String username);
 }

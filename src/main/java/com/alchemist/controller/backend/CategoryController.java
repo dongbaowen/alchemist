@@ -1,10 +1,8 @@
 package com.alchemist.controller.backend;
 
-import com.alchemist.common.Const;
 import com.alchemist.common.RedisKey;
 import com.alchemist.common.Response;
-import com.alchemist.exception.BusinessException;
-import com.alchemist.pojo.User;
+import com.alchemist.pojo.Category;
 import com.alchemist.pojo.dto.UserVO;
 import com.alchemist.service.ICategoryService;
 import com.alchemist.service.IUserService;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.Objects;
+import java.util.List;
 
 /**
  * Created by Baowen on 2017/12/3.
@@ -40,17 +38,48 @@ public class CategoryController {
     public Response addCategory(
             @RequestParam("parentId") int parentId,
             @RequestParam("categroyName") String categroyName,
-           HttpSession session) {
+            HttpSession session) {
 
-        //校验是否登录
         UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
-
-        //校验登录用户权限
 
         //添加目录
         iCategoryService.addCategory(parentId, categroyName, loginUser.getUsername());
-
-        return null;
+        return Response.createBySuccess(null);
     }
 
+
+    @RequestMapping(
+            value = "/getCategories",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Response getCategory(
+            @RequestParam(value = "parentId", defaultValue = "0") int parentId,
+            HttpSession session) {
+
+        //校验是否登录
+//        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
+
+        //添加目录
+        List<Category> categoryList = iCategoryService.getCategoryByParentId(parentId, "");
+        return Response.createBySuccess(categoryList);
+    }
+
+
+    @RequestMapping(
+            value = "/getDeepCategories",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Response getDeepCategories(
+            @RequestParam(value = "parentId", defaultValue = "0") int parentId,
+            HttpSession session) {
+
+        //校验是否登录
+//        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
+
+        //添加目录
+        List<Category> categoryList = iCategoryService.getDeepCategoryByParentId(parentId, "");
+        return Response.createBySuccess(categoryList);
+    }
 }
