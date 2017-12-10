@@ -51,4 +51,32 @@ public class ProductController {
         iProductService.updateStatus(productId, status);
         return Response.createBySuccess(null);
     }
+
+
+    @RequestMapping(
+            value = "/detail",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Response detail(
+            @RequestParam("productId") Integer productId,
+            HttpSession session) {
+
+//        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
+        return Response.createBySuccess(iProductService.manageProductDetail(productId));
+    }
+
+    @RequestMapping(
+            value = "/list",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Response list(
+            @RequestParam("pageNum") Integer pageNum,
+            @RequestParam("pageSize") Integer pageSize,
+            HttpSession session) {
+
+//        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
+        return Response.createBySuccess(iProductService.getProductList(pageNum, pageSize));
+    }
 }

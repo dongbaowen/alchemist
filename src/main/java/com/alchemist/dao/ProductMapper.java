@@ -2,6 +2,8 @@ package com.alchemist.dao;
 
 import com.alchemist.pojo.Product;
 
+import java.util.List;
+
 public interface ProductMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,6 @@ public interface ProductMapper {
     int updateByPrimaryKeySelective(Product record);
 
     int updateByPrimaryKey(Product record);
+
+    List<Product> selectAll();
 }

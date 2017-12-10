@@ -8,6 +8,9 @@ public enum ResponseCode {
     //分类相关
     CATEGORY_NOT_FOUND(20002, "未找到该分类"),
 
+    //商品相关
+    PRODUCT_NOT_FOUND(30001, "商品不存在或者已下架"),
+
     //用户相关
     SUCCESS(0,"SUCCESS"),
     ERROR(1,"ERROR"),
