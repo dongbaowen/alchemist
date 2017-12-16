@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
  * Created by Baowen on 2017/12/10.
@@ -78,5 +79,23 @@ public class ProductController {
 
 //        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
         return Response.createBySuccess(iProductService.getProductList(pageNum, pageSize));
+    }
+
+
+    @RequestMapping(
+            value = "/search",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Response search(
+//            @RequestParam(value = "productName", required = false) String productName,
+//            @RequestParam(value = "productId", required = false) Integer productId,
+//            @RequestParam("pageNum") Integer pageNum,
+//            @RequestParam("pageSize") Integer pageSize,
+            @RequestBody Map<String, String> params,
+            HttpSession session) {
+
+//        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
+        return Response.createBySuccess(iProductService.searchProductList(params.get("productName"), Integer.parseInt(params.get("productId")), 1, 1).getList());
     }
 }

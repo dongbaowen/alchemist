@@ -1,6 +1,7 @@
 package com.alchemist.dao;
 
 import com.alchemist.pojo.Product;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface ProductMapper {
     int updateByPrimaryKey(Product record);
 
     List<Product> selectAll();
+
+    List<Product> selectByProductName(@Param("productName") String productName, @Param("productId") Integer productId);
 }

@@ -79,4 +79,19 @@ public class ProductServiceImpl implements IProductService {
         return pageInfo;
     }
 
+    @Override
+    public PageInfo searchProductList(String productName, Integer productId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        String imageHost = PropertiesUtil.getProperty("ftp.server.http.prefix");
+        List<Product> productList = productMapper.selectByProductName(productName, productId);
+
+        List<ProductListVo> voList = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(productList)) {
+            productList.forEach(product -> voList.add(new ProductListVo(product, imageHost)));
+        }
+        PageInfo pageInfo = new PageInfo<>(productList);
+        pageInfo.setList(voList);
+        return pageInfo;
+    }
+
 }

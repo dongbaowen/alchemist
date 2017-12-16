@@ -16,4 +16,6 @@ public interface IProductService {
     ProductDetailVo manageProductDetail(Integer productId);
 
     PageInfo getProductList(Integer pageNum, Integer pageSize);
+
+    PageInfo searchProductList(String productName, Integer productId, Integer pageNum, Integer pageSize);
 }

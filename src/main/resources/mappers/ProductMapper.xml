@@ -181,6 +181,21 @@
     select
     <include refid="Base_Column_List" />
     from ch_mall_product
-    ORDER BY id;
+    ORDER BY id
+  </select>
+
+  <select id="selectByProductName" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from ch_mall_product
+    <where>
+      <if test="productName != null and productName != ''">
+        AND name LIKE CONCAT('%',#{productName},'%')
+      </if>
+      <if test="productId != null and productId != ''">
+        AND id = #{productId}
+      </if>
+    </where>
+    ORDER BY id
   </select>
 </mapper>
