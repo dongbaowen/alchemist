@@ -198,4 +198,22 @@
     </where>
     ORDER BY id
   </select>
+
+  <select id="selectByNameAndCategoryIds" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    from ch_mall_product
+    <where>
+      status = 1
+      <if test="idList != null and idList.size > 0">
+        AND category_id IN
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+      </if>
+      <if test="productName != null and productName != ''">
+        AND name LIKE CONCAT('%',#{productName},'%')
+      </if>
+    </where>
+  </select>
 </mapper>

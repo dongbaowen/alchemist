@@ -15,5 +15,5 @@ public interface ICategoryService {
 
     List<Category> getCategoryByParentId(int parentId, String username);
 
-    List<Category> getDeepCategoryByParentId(int categoryId, String username);
+    List<Integer> getDeepCategoryByParentId(int categoryId, String username);
 }

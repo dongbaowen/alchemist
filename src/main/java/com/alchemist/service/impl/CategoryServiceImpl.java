@@ -56,15 +56,15 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public List<Category> getDeepCategoryByParentId(int categoryId, String username) {
+    public List<Integer> getDeepCategoryByParentId(int categoryId, String username) {
 //        iUserService.isAdminPermission(username);
         Set<Category> categories = Sets.newHashSet();
-        categories = findCategoryDeepByCategoryId(categories, categoryId);
-        final List<Category> categoryList = Lists.newArrayList();
+        findCategoryDeepByCategoryId(categories, categoryId);
+        final List<Integer> idList = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(categories)) {
-            categories.forEach(category -> categoryList.add(category));
+            categories.forEach(category -> idList.add(category.getId()));
         }
-        return categoryList;
+        return idList;
     }
 
     private Set<Category> findCategoryDeepByCategoryId(Set<Category> categories, int categoryId) {

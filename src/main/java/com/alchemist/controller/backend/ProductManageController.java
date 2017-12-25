@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/manage/product")
-public class ProductController {
+public class ProductManageController {
 
     @Resource
     private IProductService iProductService;

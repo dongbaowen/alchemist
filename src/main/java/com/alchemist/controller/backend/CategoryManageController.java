@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/manage/category")
-public class CategoryController {
+public class CategoryManageController {
 
     @Resource
     private IUserService iUserService;
@@ -79,7 +79,7 @@ public class CategoryController {
 //        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
 
         //添加目录
-        List<Category> categoryList = iCategoryService.getDeepCategoryByParentId(parentId, "");
-        return Response.createBySuccess(categoryList);
+        List<Integer> categoryIdList = iCategoryService.getDeepCategoryByParentId(parentId, "");
+        return Response.createBySuccess(categoryIdList);
     }
 }

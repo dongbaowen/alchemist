@@ -1,8 +1,12 @@
 package com.alchemist.service.impl;
 
+import com.alchemist.common.Const;
+import com.alchemist.dao.CategoryMapper;
 import com.alchemist.dao.ProductMapper;
 import com.alchemist.exception.BusinessException;
+import com.alchemist.pojo.Category;
 import com.alchemist.pojo.Product;
+import com.alchemist.service.ICategoryService;
 import com.alchemist.service.IProductService;
 import com.alchemist.util.PropertiesUtil;
 import com.alchemist.vo.ProductDetailVo;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Baowen on 2017/12/10.
@@ -29,6 +34,12 @@ public class ProductServiceImpl implements IProductService {
 
     @Resource
     private ProductMapper productMapper;
+
+    @Resource
+    private CategoryMapper categoryMapper;
+
+    @Resource
+    private ICategoryService iCategoryService;
 
     @Override
     @Transactional
@@ -94,4 +105,39 @@ public class ProductServiceImpl implements IProductService {
         return pageInfo;
     }
 
+    @Override
+    public ProductDetailVo getProductDetail(Integer productId) {
+        Product product = productMapper.selectByPrimaryKey(productId);
+        if (product == null || !Objects.equals(product.getStatus(), Const.ProductStatusEnum.ON_SALE.getCode())) {
+            throw new BusinessException(1, "商品不存在或者已下架");
+        }
+        return new ProductDetailVo(product, PropertiesUtil.getProperty("ftp.server.http.prefix"));
+    }
+
+    @Override
+    public PageInfo getProductList(String keyWords, Integer categoryId, Integer pageNum, Integer pageSize, String orderBy) {
+        List<Integer> idList = Lists.newArrayList();
+        PageInfo<ProductListVo> pageInfo;
+        if (categoryId != null) {
+            Category category = categoryMapper.selectByPrimaryKey(categoryId);
+            if (category == null && StringUtils.isBlank(keyWords)) {
+                PageHelper.startPage(pageNum, pageSize);
+                pageInfo = new PageInfo<>(Lists.newArrayList());
+                return pageInfo;
+            }
+            idList = iCategoryService.getDeepCategoryByParentId(categoryId, keyWords);
+        }
+        PageHelper.startPage(pageNum, pageSize);
+        if (StringUtils.isNotBlank(orderBy)) {
+            if (Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)) {
+                String[] orderByArray = orderBy.split("_");
+                PageHelper.orderBy(orderByArray[0] + " " + orderByArray[1]);
+            }
+        }
+        List<Product> products = productMapper.selectByNameAndCategoryIds(keyWords, idList);
+        List<ProductListVo> productVoList = Lists.newArrayList();
+        products.forEach(p -> productVoList.add(new ProductListVo(p, PropertiesUtil.getProperty("ftp.server.http.prefix"))));
+        pageInfo = new PageInfo<>(productVoList);
+        return pageInfo;
+    }
 }

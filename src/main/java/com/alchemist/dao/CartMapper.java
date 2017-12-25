@@ -1,6 +1,9 @@
 package com.alchemist.dao;
 
 import com.alchemist.pojo.Cart;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface CartMapper {
     int deleteByPrimaryKey(Integer id);
@@ -13,5 +16,5 @@ public interface CartMapper {
 
     int updateByPrimaryKeySelective(Cart record);
 
-    int updateByPrimaryKey(Cart record);
+    Cart selectCartByUserIdAndProductId(@Param("userId") Integer userId, @Param("productId") Integer productId);
 }
