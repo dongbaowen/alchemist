@@ -1,13 +1,17 @@
 package com.alchemist.controller.backend;
 
+import com.alchemist.common.FileTypes;
 import com.alchemist.common.Response;
 import com.alchemist.pojo.Product;
 import com.alchemist.service.IProductService;
+import com.alchemist.util.OssService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -97,5 +101,28 @@ public class ProductManageController {
 
 //        UserVO loginUser = (UserVO) session.getAttribute(RedisKey.LOGIN_USER.getKey());
         return Response.createBySuccess(iProductService.searchProductList(params.get("productName"), Integer.parseInt(params.get("productId")), 1, 1).getList());
+    }
+
+
+    @RequestMapping("upload")
+    @ResponseBody
+    public Response upload(
+            HttpSession session,
+            @RequestParam(value = "upload_file", required = false) MultipartFile file,
+            HttpServletRequest request) {
+
+//        User user = (User) session.getAttribute(Const.CURRENT_USER);
+//        if (user == null) {
+//            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
+//        }
+//        if (iUserService.checkAdminRole(user).isSuccess()) {
+
+        String fileName = file.getOriginalFilename();
+        String path = OssService.uploadImage(FileTypes.PRODUCT_DETAIL_IMAGE, fileName, file);
+        return Response.createBySuccess(path);
+
+//        } else {
+//            return ServerResponse.createByErrorMessage("无权限操作");
+//        }
     }
 }

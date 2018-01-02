@@ -1,25 +1,27 @@
 package com.alchemist.util;
 
+import com.alchemist.common.FileTypes;
 import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.model.OSSObject;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.util.UUID;
 
 /**
  * Created by Baowen on 2017/12/23.
  */
 public class OssService {
 
-//    private static String endpoint = PropertiesUtil.getProperty("endpoint");
-//    private static String accessKeyId = PropertiesUtil.getProperty("accessKeyId");
-//    private static String accessKeySecret = PropertiesUtil.getProperty("accessKeySecret");
-//    private static String bucket = PropertiesUtil.getProperty("bucket");
+    private static String endpoint = PropertiesUtil.getProperty("aliyun.endpoint");
+    private static String accessKeyId = PropertiesUtil.getProperty("aliyun.accessKeyId");
+    private static String accessKeySecret = PropertiesUtil.getProperty("aliyun.accessKeySecret");
+    private static String bucket = PropertiesUtil.getProperty("aliyun.bucket");
+    private static String URL_PREFIX = "http://" + bucket + "." + "oss-cn-beijing.aliyuncs.com/";
 
-    private static String endpoint = "http://oss-cn-beijing.aliyuncs.com";
-    private static String accessKeyId = "RzRNcJnObRvLin4z";
-    private static String accessKeySecret = "WU9J0hvuFXzfDCo6z7Dj6gTw54q4Uf";
-    private static String bucket = "alchemist-chmall-private";
+    private static final Logger logger = LoggerFactory.getLogger(OssService.class);
 
     private static OSSClient ossClient;
 
@@ -27,67 +29,44 @@ public class OssService {
         ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
     }
 
-    public static String updateImage(String path, byte[] bytes) {
+    public static String updateImage(FileTypes type, String fileName, byte[] bytes) {
+        DateTime now = new DateTime();
+        String path = String.format(type.getPath(), now.toString("yyyyMMddHHmmss"), fileName);
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
             ossClient.putObject(bucket, path, inputStream);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("OSS上传文件异常。", e);
         }
-        return null;
+        return getFilePath(type, fileName, now);
     }
 
-    private static byte[] getBytes(String filePath) {
-        byte[] buffer = null;
+    public static String uploadImage(FileTypes type, String fileName, MultipartFile file) {
+        DateTime now = new DateTime();
+        String path = getFilePath(type, fileName, now);
         try {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-            byte[] b = new byte[1000];
-            int n;
-            while ((n = fis.read(b)) != -1) {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            bos.close();
-            buffer = bos.toByteArray();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            ossClient.putObject(bucket, path, file.getInputStream());
+        } catch (Exception e) {
+            logger.error("OSS上传文件异常。", e);
         }
-        return buffer;
+        return URL_PREFIX + path;
     }
 
-    public static byte[] getImage(String filePath) {
-        byte[] imageBytes;
-        OSSObject object = ossClient.getObject(bucket, filePath);
-        InputStream inputStream = object.getObjectContent();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int n = 0;
-        try {
-            while ((n = inputStream.read(buffer)) != -1) {
-                out.write(buffer, 0, n);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        imageBytes = out.toByteArray();
-        return imageBytes;
+    /**
+     * 获取图片路径
+     * http://alchemist-chmall-private.oss-cn-beijing.aliyuncs.com/conghua_mall/header/1.jpg
+     *
+     * @return
+     */
+    private static String getFilePath(FileTypes type, String fileName, DateTime time) {
+        String suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+        fileName = UUID.randomUUID().toString().replaceAll("-", "") + time.toString("yyyyMMddHHmmss");
+        return String.format(type.getPath(), fileName + suffix);
     }
 
-
-    public static void main(String[] args) throws IOException {
-//        byte[] bytes = getBytes("F:\\1.jpg");
-        String path = "conghua_mall/header/1.jpg";
-//        updateImage(path, bytes);
-
-        byte[] bytes1 = getImage(path);
-        OutputStream out = new FileOutputStream("F://idcard//" + new DateTime().toString("yyyyMMddHHmmss") + ".jpg");
-        out.write(bytes1);
-        out.flush();
-        out.close();
-
+    public static void main(String[] args) {
+        String fileName = "asndf.jpg";
+        String suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+        System.out.println(suffix);
     }
 }
