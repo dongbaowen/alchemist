@@ -9,9 +9,11 @@ import com.alchemist.service.ICartService;
 import com.alchemist.util.BigDecimalUtil;
 import com.alchemist.vo.CartProductVo;
 import com.alchemist.vo.CartVo;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -29,7 +31,8 @@ public class CartServiceImpl implements ICartService {
     @Resource
     private ProductMapper productMapper;
 
-    public List add(Integer userId, Integer productId, Integer count) {
+    @Transactional
+    public CartVo add(Integer userId, Integer productId, Integer count) {
         Cart cart = cartMapper.selectCartByUserIdAndProductId(userId, productId);
         if (cart == null) {
             cart = new Cart();
@@ -42,10 +45,47 @@ public class CartServiceImpl implements ICartService {
             cart.setQuantity(cart.getQuantity() + count);
             cartMapper.updateByPrimaryKeySelective(cart);
         }
-
-        return null;
+        return getCartVoLimit(userId);
     }
 
+    @Transactional
+    public CartVo update(Integer userId, Integer productId, Integer count) {
+        Cart cart = cartMapper.selectCartByUserIdAndProductId(userId, productId);
+        if (cart != null) {
+            cart.setQuantity(count);
+            cartMapper.updateByPrimaryKeySelective(cart);
+        }
+        return getCartVoLimit(userId);
+    }
+
+    @Transactional
+    public CartVo delete(Integer userId, String productIdsStr) {
+        List<String> productIds = Splitter.on(",").trimResults().splitToList(productIdsStr);
+        if (CollectionUtils.isNotEmpty(productIds)) {
+            cartMapper.deleteCartByProductIds(userId, productIds);
+        }
+        return getCartVoLimit(userId);
+    }
+
+    public CartVo list(Integer userId) {
+        return getCartVoLimit(userId);
+    }
+
+    public CartVo changeChecked(Integer userId, Integer productId, Integer checked) {
+        cartMapper.changeCheckedByUserIdAndProductId(userId, productId, checked);
+        return getCartVoLimit(userId);
+    }
+
+    public int getQuantityOfCart(Integer userId) {
+        return cartMapper.selectCartProductCount(userId);
+    }
+
+    /**
+     * 获取用户的购物车
+     *
+     * @param userId
+     * @return
+     */
     private CartVo getCartVoLimit(Integer userId) {
         CartVo cartVo = new CartVo();
         List<CartProductVo> cartProductVoList = Lists.newArrayList();
@@ -59,6 +99,7 @@ public class CartServiceImpl implements ICartService {
                 if (product != null) {
                     CartProductVo cartProductVo = new CartProductVo();
                     cartProductVo.setId(cart.getId());
+                    cartProductVo.setUserId(cart.getUserId());
                     cartProductVo.setProductId(cart.getProductId());
                     cartProductVo.setProductChecked(cart.getChecked());
                     cartProductVo.setProductName(product.getName());

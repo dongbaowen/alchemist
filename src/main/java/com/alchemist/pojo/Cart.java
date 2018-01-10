@@ -2,6 +2,9 @@ package com.alchemist.pojo;
 
 import java.util.Date;
 
+/**
+ * 购物项【谁】将【quantity】个产品【productId】添加到购物车，勾选状态为【checked】
+ */
 public class Cart {
     private Integer id;
 
