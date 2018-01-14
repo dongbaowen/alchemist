@@ -62,7 +62,6 @@ public class UserServiceImpl implements IUserService {
             } else {
                 user = userMapper.selectByEmail(str);
             }
-
             return user == null;
         }
         return false;

@@ -154,4 +154,12 @@
         WHERE user_id = #{userId}
         AND checked = 1
     </select>
+
+    <select id="selectCheckedCartByUserId" parameterType="int" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from ch_mall_cart
+        where user_id = #{userId}
+        and checked = 1
+    </select>
 </mapper>
